@@ -64,6 +64,7 @@ public class GameRoom : MonoBehaviour
         });
 
         sioCom.Instance.Emit("get ready");
+        sioCom.Instance.Emit("get room");
     }
 
     public void outRoom()

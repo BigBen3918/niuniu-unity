@@ -113,7 +113,6 @@ public class RobbyManager : MonoBehaviour
                 lobby_item.SetActive(false);
                 break;
             case 1:     // enter in lobby
-                
                 hall.SetActive(false);
                 hall_item.SetActive(false);
                 lobby.SetActive(true);
