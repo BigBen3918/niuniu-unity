@@ -28,9 +28,9 @@ public class table : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
-    }
 
+    }
+    
     public void setToggle(int index)
     {
         if(index == 1)

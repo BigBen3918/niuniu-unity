@@ -13,6 +13,7 @@ public class GameRoom : MonoBehaviour
     public Transform[] card_persons;
     public Sprite[] spade, heart, club, diamond;
     public List<int> cards;
+    public Text roomNumber, bonus;
 
     void Awake()
     {
@@ -24,7 +25,7 @@ public class GameRoom : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        OnRoomData();
+        //OnRoomData();
     }
 
     ~GameRoom()
@@ -48,7 +49,9 @@ public class GameRoom : MonoBehaviour
         });
         sioCom.Instance.On("room status", (string data) =>
         {
-            // game status
+            JSONNode reqData = JSON.Parse(data);
+            roomNumber.text = reqData["roomNumber"].ToString();
+            bonus.text = reqData["cost"].ToString();
         });
         sioCom.Instance.On("room update", (string data) =>
         { 
@@ -64,7 +67,6 @@ public class GameRoom : MonoBehaviour
         });
 
         sioCom.Instance.Emit("get ready");
-        sioCom.Instance.Emit("get room");
     }
 
     public void outRoom()
@@ -74,8 +76,22 @@ public class GameRoom : MonoBehaviour
 
     public void bet(int index)
     {
-        
         //sioCom.Instance.Emit("bet");
+    }
+
+    public void test()
+    {
+        List<int> mmm = new List<int>();
+        for (int i = 0; i < 4;)
+        {
+            int a = Random.Range(1, 39);
+            if (a % 10 != 0)
+            {
+                mmm.Add(a);
+                i++;
+            }
+        }
+        game_start(mmm, 2);
     }
 
     // UI Management
@@ -95,7 +111,7 @@ public class GameRoom : MonoBehaviour
             {
                 case 0:
                     person1.SetBool("flag", true);
-                    yield return new WaitForSeconds(0.8f);
+                    yield return new WaitForSeconds(0.8f);            
                     break;
                 case 1:
                     person3.SetBool("flag", true);
@@ -120,9 +136,20 @@ public class GameRoom : MonoBehaviour
             }
         }
         yield return new WaitForSeconds(0.2f);
+
         Cards.SetBool("flag", false);
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.5f);
+
+        StartCoroutine(card_anim_rotate());
+        yield return new WaitForSeconds(0.25f);
+
         StartCoroutine(card_anim_open(arr));
+    }
+
+    private IEnumerator card_anim_rotate()
+    {
+        person1.SetBool("rotate_flag", true);
+        yield return new WaitForSeconds(0.1f);
     }
 
     private IEnumerator card_anim_open(List<int> arr)
@@ -147,7 +174,7 @@ public class GameRoom : MonoBehaviour
             }
         }
         yield return new WaitForSeconds(0.2f);
-        sioCom.Instance.Emit("ready on");
+        //sioCom.Instance.Emit("ready on");
     }
 
     private IEnumerator card_init()
