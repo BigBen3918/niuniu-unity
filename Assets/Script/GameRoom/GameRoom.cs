@@ -25,7 +25,7 @@ public class GameRoom : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //OnRoomData();
+        OnRoomData();
     }
 
     ~GameRoom()
@@ -174,7 +174,7 @@ public class GameRoom : MonoBehaviour
             }
         }
         yield return new WaitForSeconds(0.2f);
-        //sioCom.Instance.Emit("ready on");
+        sioCom.Instance.Emit("ready on");
     }
 
     private IEnumerator card_init()
