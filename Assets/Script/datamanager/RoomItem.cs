@@ -36,30 +36,3 @@ public class RoomItem : MonoBehaviour
         robby.joinRoom(roominfo);
     }
 }
-
-[Serializable]
-public class Room
-{
-    public string id;
-    public string setting;
-    public float cost;
-    public User[] players;
-    public int maxPlayer;
-
-    public Room(string setting, float cost, string id = "", int maxPlayer = 6)
-    {
-        this.setting = setting;
-        this.cost = cost;
-        this.id = id;
-        this.maxPlayer = maxPlayer;
-    }
-
-    public Room(Room _userinfo)
-    {
-        this.id = _userinfo.id;
-        this.setting = _userinfo.setting;
-        this.cost = _userinfo.cost;
-        this.players = _userinfo.players;
-        this.maxPlayer = _userinfo.maxPlayer;
-    }
-}
