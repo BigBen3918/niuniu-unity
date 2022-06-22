@@ -76,16 +76,13 @@ public class RobbyManager : MonoBehaviour
         {
             ExtensionMethods.Clear(roomsContent.transform);
         }
-        else
+        for (int i = 0; i < GlobalDatas.rooms.rooms.Length; i++)
         {
-            for (int i = 0; i < GlobalDatas.rooms.rooms.Length; i++)
-            {
-                Room roomInfo = GlobalDatas.rooms.rooms[i];
-                GameObject _roomItem = Instantiate(roomItem);
-                _roomItem.transform.parent = roomsContent.transform;
+            Room roomInfo = GlobalDatas.rooms.rooms[i];
+            GameObject _roomItem = Instantiate(roomItem);
+            _roomItem.transform.parent = roomsContent.transform;
 
-                _roomItem.GetComponent<RoomItem>().setRoomInfo(roomInfo);
-            }
+            _roomItem.GetComponent<RoomItem>().setRoomInfo(roomInfo);
         }
     }
 

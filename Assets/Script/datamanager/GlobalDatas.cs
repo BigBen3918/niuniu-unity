@@ -31,17 +31,6 @@ public class RoomLists
     public Room[] rooms;
 }
 
-[Serializable]
-public class PlayerStatus
-{
-    public User player;
-    public string roll;
-    public int grab;
-    public int doubles;
-    public int[] cards;
-    public float score;
-}
-
 /** Global Main Class */
 
 [Serializable]
@@ -54,16 +43,18 @@ public class Room
     public string name;
     public int maxPlayer;
     public int gameStatus;
-    public int roller;
+    public int roleCount;
     public User[] players;
-    public PlayerStatus[] playerStatus;
+    public User[] playerStatus;
 
-    public Room(string setting, float cost, string id = "", int maxPlayer = 6)
+    public Room(string setting, float cost, string id = "", int maxPlayer = 6, int roleCount = -1, int gameStatus = 0)
     {
         this.setting = setting;
         this.cost = cost;
         this.id = id;
         this.maxPlayer = maxPlayer;
+        this.roleCount = roleCount;
+        this.gameStatus = gameStatus;
     }
 
     public Room(Room _userinfo)
@@ -73,6 +64,7 @@ public class Room
         this.cost = _userinfo.cost;
         this.players = _userinfo.players;
         this.maxPlayer = _userinfo.maxPlayer;
+        this.roleCount = _userinfo.roleCount;
     }
 }
 
@@ -80,35 +72,57 @@ public class Room
 public class User
 {
     public string username;
-    public string score;
+    public RoundScore roundScore;
     public string id;
     public string image;
     public string phonenumber;
-    public int grab = 5;
-    public int doubles = 5;
-    public string roll;
+    public int grab = -1;
+    public int doubles = -1;
+    public string role;
+    public int[] cards;
+    public float score;
 
-    public User(string username, string score, string id, string image = "", string phonenumber = "", int grab = 5, int doubles = 5,string roll = "")
+    public User(string username, string id, string image = "", string phonenumber = "", int grab = -1, int doubles = -1,string role = "", int[] cards = null, float score = 0f)
     {
         this.username = username;
-        this.score = score;
         this.id = id;
         this.image = image;
         this.phonenumber = phonenumber;
         this.grab = grab;
         this.doubles = doubles;
-        this.roll = roll;
+        this.role = role;
+        this.cards = cards;
+        this.score = score;
     }
 
     public User(User _userinfo)
     {
         this.username = _userinfo.username;
-        this.score = _userinfo.score;
         this.id = _userinfo.id;
         this.image = _userinfo.image;
         this.phonenumber = _userinfo.phonenumber;
         this.grab = _userinfo.grab;
         this.doubles = _userinfo.doubles;
-        this.roll = _userinfo.roll;
+        this.role = _userinfo.role;
+        this.score = _userinfo.score;
+    }
+}
+
+[Serializable]
+public class RoundScore
+{
+    public string type;
+    public float score;
+    public int multiple;
+    public int[] cards;
+    public int[] activityCards;
+
+    public RoundScore(string _type = "", float _score = 0f, int _multiple = -1, int[] _cards = null, int[] _activityCards = null)
+    {
+        this.type = _type;
+        this.score = _score;
+        this.multiple = _multiple;
+        this.cards = _cards;
+        this.activityCards = _activityCards;
     }
 }
