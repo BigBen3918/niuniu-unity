@@ -61,20 +61,28 @@ public class GameRoom : MonoBehaviour
                 multiplePanel.SetActive(true);
             }
         }
+        else if(GlobalDatas.croom.gameStatus == 5)
+        {
+            multiplePanel.SetActive(false);
+            grabPanel.SetActive(false);
+        }
     }
+
     // set robby list data
-    private void loadUserInfo()
+    public void loadUserInfo()
     {
         bonus.text = GlobalDatas.croom.cost.ToString();
         roomNumber.text = GlobalDatas.croom.id.ToString();
         int playerIndex = getplayerIndex();
         for (int i = playerIndex; i < GlobalDatas.croom.players.Length; i++)
         {
-            persons[i - playerIndex].setUserInfo(GlobalDatas.croom.players[i].score, GlobalDatas.croom.players[i].username);
+            persons[i - playerIndex].setUserInfo(GlobalDatas.croom.players[i].balance, GlobalDatas.croom.players[i].username);
+            persons[i - playerIndex].setImage(GlobalDatas.croom.players[i].image);
         }
         for (int i = 0; i < playerIndex; i++)
         {
-            persons[playerIndex + i].setUserInfo(GlobalDatas.croom.players[i].score, GlobalDatas.croom.players[i].username);
+            persons[playerIndex + i].setUserInfo(GlobalDatas.croom.players[i].balance, GlobalDatas.croom.players[i].username);
+            persons[playerIndex + i].setImage(GlobalDatas.croom.players[i].image);
         }
     }
 
@@ -89,26 +97,56 @@ public class GameRoom : MonoBehaviour
         {
             Room room = JsonUtility.FromJson<Room>(data);
             GlobalDatas.croom = room;
+            loadUserInfo();
             if (room.roleCount == 0 && room.gameStatus == 1)
             {
                 StartCoroutine(game_start_enum());
             }
+            if (room.roleCount == 1 && room.gameStatus == 2)
+            {
+                // reset grab
+                for (int i = 0; i < GlobalDatas.croom.playerStatus.Length; i++)
+                {
+                    persons[i].resetGrab();
+                }
+                
+                // set banker
+                for (int i = GlobalDatas.myIndex; i < GlobalDatas.croom.players.Length; i++)
+                {
+                    if (GlobalDatas.croom.playerStatus[i].role == "banker")
+                        persons[i - GlobalDatas.myIndex].setBanker();
+                }
+                for (int i = 0; i < GlobalDatas.myIndex; i++)
+                {
+                    if (GlobalDatas.croom.playerStatus[i].role == "banker")
+                        persons[GlobalDatas.myIndex + i].setBanker();
+                }
+            }
             if(room.gameStatus == 5)
             {
                 StartCoroutine(game_end_enum());
+                Debug.Log("gmae ended===========");
             }
-            loadUserInfo();
         });
 
         sioCom.Instance.On("grabBank", (string data) =>
         {
             Multiple grabBank = JsonUtility.FromJson<Multiple>(data);
-            for (int i = 0; i < GlobalDatas.croom.playerStatus.Length; i++)
+            for (int i = GlobalDatas.myIndex; i < GlobalDatas.croom.players.Length; i++)
             {
                 if (GlobalDatas.croom.playerStatus[i].username == grabBank.player.username)
                 {
                     GlobalDatas.croom.playerStatus[i].grab = grabBank.multiple;
-                    persons[i].setGrab(grabBank.multiple);
+                    persons[i - GlobalDatas.myIndex].setGrab(grabBank.multiple);
+                    break;
+                }
+            }
+            for (int i = 0; i < GlobalDatas.myIndex; i++)
+            {
+                if (GlobalDatas.croom.playerStatus[i].username == grabBank.player.username)
+                {
+                    GlobalDatas.croom.playerStatus[i].grab = grabBank.multiple;
+                    persons[i + GlobalDatas.myIndex].setGrab(grabBank.multiple);
                     break;
                 }
             }
@@ -122,12 +160,21 @@ public class GameRoom : MonoBehaviour
         sioCom.Instance.On("double", (string data) =>
         {
             Multiple doubles = JsonUtility.FromJson<Multiple>(data);
-            for (int i = 0; i < GlobalDatas.croom.playerStatus.Length; i++)
+            for (int i = GlobalDatas.myIndex; i < GlobalDatas.croom.players.Length; i++)
             {
                 if (GlobalDatas.croom.playerStatus[i].username == doubles.player.username)
                 {
-                    GlobalDatas.croom.playerStatus[i].doubles = doubles.multiple;
-                    persons[i].setGrab(doubles.multiple);
+                    GlobalDatas.croom.playerStatus[i].grab = doubles.multiple;
+                    persons[i - GlobalDatas.myIndex].setGrab(doubles.multiple);
+                    break;
+                }
+            }
+            for (int i = 0; i < GlobalDatas.myIndex; i++)
+            {
+                if (GlobalDatas.croom.playerStatus[i].username == doubles.player.username)
+                {
+                    GlobalDatas.croom.playerStatus[i].grab = doubles.multiple;
+                    persons[i + GlobalDatas.myIndex].setGrab(doubles.multiple);
                     break;
                 }
             }
@@ -135,10 +182,7 @@ public class GameRoom : MonoBehaviour
 
         sioCom.Instance.On("endRound", (string data) =>
         {
-            GlobalDatas.croom.playerStatus[GlobalDatas.myIndex].doubles = -1;
-            Debug.Log("my score: " + GlobalDatas.croom.playerStatus[GlobalDatas.myIndex].roundScore.score);
-            Debug.Log("please wait 10sec...");
-            StartCoroutine(game_end_enum());
+            sioCom.Instance.Emit("room status");
         });
 
         sioCom.Instance.On("outed room", (string data) =>
@@ -148,7 +192,7 @@ public class GameRoom : MonoBehaviour
 
         sioCom.Instance.Emit("is ready");
     }
-  
+
     public void bet(int multiple)
     {
         Grab grab = new Grab(multiple);
@@ -186,7 +230,6 @@ public class GameRoom : MonoBehaviour
             StartCoroutine(persons[playerIndex + i].setCardEnumerator(GlobalDatas.croom.playerStatus[i].cards));
         }
         yield return new WaitForSeconds(0.8f);
-
     }
     private IEnumerator game_end_enum()
     {
@@ -200,8 +243,18 @@ public class GameRoom : MonoBehaviour
         {
             StartCoroutine(persons[i + playerIndex].setCardEnumerator(GlobalDatas.croom.playerStatus[i].cards));
         }
-        yield return new WaitForSeconds(8f);
 
+        showEffect();
+        yield return new WaitForSeconds(6f);
+
+        for (int i = 0; i < GlobalDatas.croom.playerStatus.Length; i++)
+        {
+            persons[i].resetGrab();
+        }
+        for (int i = 0; i < GlobalDatas.croom.playerStatus.Length; i++)
+        {
+            persons[i].resetBanker();
+        }
         for (int i = 0; i < GlobalDatas.croom.playerStatus.Length; i++)
         {
             StartCoroutine(persons[i].cardClear());
@@ -221,6 +274,57 @@ public class GameRoom : MonoBehaviour
             }
         }
         return count;
+    }
+
+    public void outRoom()
+    {
+        sioCom.Instance.Emit("out room");
+    }
+
+    public void showEffect()
+    {
+        int bankerIndex = 0;
+        float[] result = new float[6];
+        for(int i = 0; i < GlobalDatas.croom.players.Length; i++)
+        {
+            if(GlobalDatas.croom.playerStatus[i].role == "banker")
+            {
+                bankerIndex = i;
+                break;
+            }
+        }
+        for (int i = 0; i < GlobalDatas.croom.players.Length; i++)
+        {
+            if (bankerIndex != i)
+            {
+                if(GlobalDatas.croom.playerStatus[bankerIndex].roundScore.score > GlobalDatas.croom.playerStatus[i].roundScore.score)
+                {
+                    float realMoney = GlobalDatas.croom.cost * GlobalDatas.croom.playerStatus[bankerIndex].roundScore.multiple * GlobalDatas.croom.playerStatus[i].doubles * GlobalDatas.croom.playerStatus[bankerIndex].grab;
+                    result[bankerIndex] += realMoney;
+                    result[i] += 0 - realMoney;
+                }
+                else
+                {
+                    float realMoney = GlobalDatas.croom.cost * GlobalDatas.croom.playerStatus[i].roundScore.multiple * GlobalDatas.croom.playerStatus[i].doubles * GlobalDatas.croom.playerStatus[bankerIndex].grab;
+                    result[bankerIndex] += 0 - realMoney;
+                    result[i] += realMoney;
+                }
+            }
+        }
+        for (int i = GlobalDatas.myIndex; i < GlobalDatas.croom.players.Length; i++)
+        {
+            if(result[i] > 0)
+                persons[i - GlobalDatas.myIndex].setEarn("+" + result[i].ToString());
+            else
+                persons[i - GlobalDatas.myIndex].setEarn(result[i].ToString());
+        }
+        for (int i = 0; i < GlobalDatas.myIndex; i++)
+        {
+            if (result[i] > 0)
+                persons[i + GlobalDatas.myIndex].setEarn("+" + result[i].ToString());
+            else
+                persons[i + GlobalDatas.myIndex].setEarn(result[i].ToString());
+        }
     }
 }
 

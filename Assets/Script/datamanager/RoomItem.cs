@@ -17,17 +17,6 @@ public class RoomItem : MonoBehaviour
         id_field.text = roominfo.id;
         setting_field.text = roominfo.setting;
         cost_field.text = (roominfo.cost).ToString();
-        // set players info and max is 6
-        //players = ExtensionMethods.FindChildren(transform, "user");
-        //for (int i = 0; i < roominfo.players.Length && i < 6; i++)
-        //{
-        //    Transform playerImage = players[i].GetChild(0);
-        //    StartCoroutine(ExtensionMethods.GetTextureFromURL(roominfo.players[i].image, (Texture2D image, bool isSuccess) =>
-        //    {
-        //        if (!isSuccess) return;
-        //        playerImage.GetComponent<RawImage>().texture = image;
-        //    }));
-        //}
     }
 
     public void getRoomInfo()

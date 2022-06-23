@@ -71,18 +71,20 @@ public class Room
 [Serializable]
 public class User
 {
-    public string username;
-    public RoundScore roundScore;
-    public string id;
-    public string image;
-    public string phonenumber;
-    public int grab = -1;
-    public int doubles = -1;
-    public string role;
     public int[] cards;
-    public float score;
+    public int doubles = -1;
+    public int grab = -1;
+    public string id;
+    public string role;
+    public RoundScore roundScore;
 
-    public User(string username, string id, string image = "", string phonenumber = "", int grab = -1, int doubles = -1,string role = "", int[] cards = null, float score = 0f)
+    // auth
+    public string username;
+    public string phonenumber;
+    public string image;
+    public float balance;
+
+    public User(string username, string id, string image = "", string phonenumber = "", int grab = -1, int doubles = -1,string role = "", int[] cards = null, float balance = 0f)
     {
         this.username = username;
         this.id = id;
@@ -92,7 +94,7 @@ public class User
         this.doubles = doubles;
         this.role = role;
         this.cards = cards;
-        this.score = score;
+        this.balance = balance;
     }
 
     public User(User _userinfo)
@@ -104,7 +106,7 @@ public class User
         this.grab = _userinfo.grab;
         this.doubles = _userinfo.doubles;
         this.role = _userinfo.role;
-        this.score = _userinfo.score;
+        this.balance = _userinfo.balance;
     }
 }
 

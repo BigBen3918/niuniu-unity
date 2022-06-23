@@ -8,6 +8,7 @@ public class UserPerson : MonoBehaviour
     public Text username, balance, multiple;
     public Transform userImageObject, cardsObject;
     public Transform bankerMark;
+    public RawImage image;
     public Sprite[] spade, heart, club, diamond;
     public Sprite back;
     public Animator cardAnimator;
@@ -21,6 +22,7 @@ public class UserPerson : MonoBehaviour
         cardsObject = transform.GetChild(2);
         bankerMark = transform.GetChild(3).GetChild(1);
         cardAnimator = transform.GetChild(2).GetComponent<Animator>();
+        image = transform.GetChild(1).GetChild(0).GetComponent<RawImage>();
 
         GameRoom roomManager = GameObject.Find("RoomManager").GetComponent<GameRoom>();
         spade = roomManager.spade;
@@ -31,8 +33,8 @@ public class UserPerson : MonoBehaviour
     // before game
     public void setUserInfo(float _balance, string _username)
     {
-        username.text = _username;
-        balance.text = _balance.ToString();
+        username.text = _balance.ToString();
+        balance.text = _username;
     }
 
     // game actions
@@ -40,11 +42,30 @@ public class UserPerson : MonoBehaviour
     {
         if (i == 0) multiple.text = "不抢";
         else multiple.text = i.ToString() + "x";
-        Debug.Log(multiple.text);
+    }
+    public void resetGrab()
+    {
+        multiple.text = "";
     }
     public void setBanker()
     {
         bankerMark.gameObject.SetActive(true);
+    }
+    public void resetBanker()
+    {
+        bankerMark.gameObject.SetActive(false);
+    }
+    public void setEarn(string earn)
+    {
+        multiple.text = earn;
+    }
+    public void setImage(string url)
+    {
+        StartCoroutine(ExtensionMethods.GetTextureFromURL(url, (Texture2D coverImage, bool isSuccess) =>
+        {
+            if (!isSuccess) return;
+            image.texture = coverImage;
+        }));
     }
     // init state
 
@@ -57,9 +78,9 @@ public class UserPerson : MonoBehaviour
 
     public IEnumerator setCardEnumerator(int[] _cards)
     {
-        if(_cards.Length>0)
+        if(_cards.Length > 0)
             cardAnimator.SetBool("rotate_flag", true);
-        yield return new WaitForSeconds(0.25f);
+        yield return new WaitForSeconds(0.3f);
         for (int i = 0; i < _cards.Length; i++)
         {
             switch (_cards[i] / 10)
@@ -87,7 +108,7 @@ public class UserPerson : MonoBehaviour
         {
             transform.GetChild(2).GetChild(i).GetComponent<Image>().sprite = back;
         }
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(0.5f);
     }
 }
 
