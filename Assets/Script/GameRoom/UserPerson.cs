@@ -110,10 +110,6 @@ public class UserPerson : MonoBehaviour
 
         for (int i = 0; i < _cards.Length; i++)
         {
-            if (GlobalDatas.croom.gameStatus == 5)
-            {
-                Debug.Log(i + " ===== " + _cards[i]);
-            }
             switch (_cards[i] / 10)
             {
                 case 0:     // diamond card

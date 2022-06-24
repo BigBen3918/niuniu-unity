@@ -62,9 +62,9 @@ public class RobbyManager : MonoBehaviour
         {
             Room room = JsonUtility.FromJson<Room>(data);
             GlobalDatas.croom = room;
-            SceneManager.LoadScene(2);
             sioCom.Instance.Off("rooms");
             sioCom.Instance.Off("entered room");
+            SceneManager.LoadScene(2);
         });
 
         sioCom.Instance.Emit("get rooms");

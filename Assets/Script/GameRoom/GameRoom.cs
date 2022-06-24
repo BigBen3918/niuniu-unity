@@ -32,14 +32,6 @@ public class GameRoom : MonoBehaviour
         OnRoomData();
     }
 
-    ~GameRoom()
-    {
-        sioCom.Instance.Emit("out room");
-        sioCom.Instance.Off("start game");
-        sioCom.Instance.Off("room status");
-        sioCom.Instance.Off("room update");
-    }
-
     private void Update()
     {
         grabPanel.SetActive(false);
@@ -201,6 +193,13 @@ public class GameRoom : MonoBehaviour
 
         sioCom.Instance.On("outed room", (string data) =>
         {
+            sioCom.Instance.Off("round start");
+            sioCom.Instance.Off("room status");
+            sioCom.Instance.Off("grabBank");
+            sioCom.Instance.Off("endGrab");
+            sioCom.Instance.Off("double");
+            sioCom.Instance.Off("endRound");
+            sioCom.Instance.Off("outed room");
             SceneManager.LoadScene(1);
         });
 

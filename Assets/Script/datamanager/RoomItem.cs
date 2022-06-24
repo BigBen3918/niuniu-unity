@@ -10,6 +10,12 @@ public class RoomItem : MonoBehaviour
     public TextMeshProUGUI setting_field;
     public TextMeshProUGUI cost_field;
     public Transform[] players;
+
+    void Start()
+    {
+        this.transform.localScale = new Vector3(1f, 1f, 1f);
+    }
+
     public void setRoomInfo(Room _userinfo)
     {
         //set room info
