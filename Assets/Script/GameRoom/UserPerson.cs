@@ -104,12 +104,16 @@ public class UserPerson : MonoBehaviour
 
     public IEnumerator setCardEnumerator(int[] _cards)
     {
-        Debug.Log(_cards);
         if(_cards.Length > 0)
             cardAnimator.SetBool("rotate_flag", true);
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(0.5f);
+
         for (int i = 0; i < _cards.Length; i++)
         {
+            if (GlobalDatas.croom.gameStatus == 5)
+            {
+                Debug.Log(i + " ===== " + _cards[i]);
+            }
             switch (_cards[i] / 10)
             {
                 case 0:     // diamond card

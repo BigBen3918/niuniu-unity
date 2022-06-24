@@ -250,7 +250,7 @@ public class GameRoom : MonoBehaviour
         GlobalDatas.myIndex = playerIndex;
         for (int i = playerIndex; i < GlobalDatas.croom.playerStatus.Length; i++)
         {
-            StartCoroutine(persons[i - playerIndex + 1].setCardEnumerator(GlobalDatas.croom.playerStatus[i].cards));
+            StartCoroutine(persons[i - playerIndex].setCardEnumerator(GlobalDatas.croom.playerStatus[i].cards));
         }
         for (int i = 0; i < playerIndex; i++)
         {
