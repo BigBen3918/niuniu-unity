@@ -29,7 +29,6 @@ public class GameRoom : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        loadUserInfo();
         OnRoomData();
     }
 
@@ -61,7 +60,7 @@ public class GameRoom : MonoBehaviour
                 multiplePanel.SetActive(true);
             }
         }
-        else if(GlobalDatas.croom.gameStatus == 5)
+        else if (GlobalDatas.croom.gameStatus == 5)
         {
             multiplePanel.SetActive(false);
             grabPanel.SetActive(false);
@@ -71,18 +70,19 @@ public class GameRoom : MonoBehaviour
     // set robby list data
     public void loadUserInfo()
     {
+        int playerIndex = getplayerIndex();
+        GlobalDatas.myIndex = playerIndex;
         bonus.text = GlobalDatas.croom.cost.ToString();
         roomNumber.text = GlobalDatas.croom.id.ToString();
-        int playerIndex = getplayerIndex();
-        for (int i = playerIndex; i < GlobalDatas.croom.players.Length; i++)
+        for (int i = playerIndex; i < GlobalDatas.croom.playerStatus.Length; i++)
         {
-            persons[i - playerIndex].setUserInfo(GlobalDatas.croom.players[i].balance, GlobalDatas.croom.players[i].username);
-            persons[i - playerIndex].setImage(GlobalDatas.croom.players[i].image);
+            persons[i - playerIndex].setUserInfo(GlobalDatas.croom.playerStatus[i].balance, GlobalDatas.croom.playerStatus[i].username);
+            persons[i - playerIndex].setImage(GlobalDatas.croom.playerStatus[i].image);
         }
         for (int i = 0; i < playerIndex; i++)
         {
-            persons[playerIndex + i].setUserInfo(GlobalDatas.croom.players[i].balance, GlobalDatas.croom.players[i].username);
-            persons[playerIndex + i].setImage(GlobalDatas.croom.players[i].image);
+            persons[GlobalDatas.croom.playerStatus.Length - playerIndex + i].setUserInfo(GlobalDatas.croom.playerStatus[i].balance, GlobalDatas.croom.playerStatus[i].username);
+            persons[GlobalDatas.croom.playerStatus.Length - playerIndex + i].setImage(GlobalDatas.croom.playerStatus[i].image);
         }
     }
 
@@ -91,25 +91,40 @@ public class GameRoom : MonoBehaviour
         sioCom.Instance.On("round start", (string data) => 
         {
             sioCom.Instance.Emit("room status");
+            GlobalDatas.isStarted = true;
         });
 
         sioCom.Instance.On("room status", (string data) =>
         {
+            for (int i = 0; i < 6; i++)
+            {
+                persons[i].resetUserInfo();
+            }
             Room room = JsonUtility.FromJson<Room>(data);
             GlobalDatas.croom = room;
+
             loadUserInfo();
-            if (room.roleCount == 0 && room.gameStatus == 1)
+            if (GlobalDatas.isStarted == true)
             {
+                for (int i = 0; i < 6; i++)
+                {
+                    persons[i].resetGrab();
+                    persons[i].resetBanker();
+                    persons[i].resetAcionCard();
+                    StartCoroutine(persons[i].cardClear());
+                }
+
+                GlobalDatas.isStarted = false;
                 StartCoroutine(game_start_enum());
             }
-            if (room.roleCount == 1 && room.gameStatus == 2)
+            if (room.gameStatus == 2)
             {
                 // reset grab
-                for (int i = 0; i < GlobalDatas.croom.playerStatus.Length; i++)
+                for (int i = 0; i < 6; i++)
                 {
                     persons[i].resetGrab();
                 }
-                
+                 
                 // set banker
                 for (int i = GlobalDatas.myIndex; i < GlobalDatas.croom.players.Length; i++)
                 {
@@ -119,20 +134,19 @@ public class GameRoom : MonoBehaviour
                 for (int i = 0; i < GlobalDatas.myIndex; i++)
                 {
                     if (GlobalDatas.croom.playerStatus[i].role == "banker")
-                        persons[GlobalDatas.myIndex + i].setBanker();
+                        persons[GlobalDatas.croom.playerStatus.Length - GlobalDatas.myIndex + i].setBanker();
                 }
             }
             if(room.gameStatus == 5)
             {
                 StartCoroutine(game_end_enum());
-                Debug.Log("gmae ended===========");
             }
         });
 
         sioCom.Instance.On("grabBank", (string data) =>
         {
             Multiple grabBank = JsonUtility.FromJson<Multiple>(data);
-            for (int i = GlobalDatas.myIndex; i < GlobalDatas.croom.players.Length; i++)
+            for (int i = GlobalDatas.myIndex; i < GlobalDatas.croom.playerStatus.Length; i++)
             {
                 if (GlobalDatas.croom.playerStatus[i].username == grabBank.player.username)
                 {
@@ -146,7 +160,7 @@ public class GameRoom : MonoBehaviour
                 if (GlobalDatas.croom.playerStatus[i].username == grabBank.player.username)
                 {
                     GlobalDatas.croom.playerStatus[i].grab = grabBank.multiple;
-                    persons[i + GlobalDatas.myIndex].setGrab(grabBank.multiple);
+                    persons[GlobalDatas.croom.playerStatus.Length - GlobalDatas.myIndex + i].setGrab(grabBank.multiple);
                     break;
                 }
             }
@@ -174,7 +188,7 @@ public class GameRoom : MonoBehaviour
                 if (GlobalDatas.croom.playerStatus[i].username == doubles.player.username)
                 {
                     GlobalDatas.croom.playerStatus[i].grab = doubles.multiple;
-                    persons[i + GlobalDatas.myIndex].setGrab(doubles.multiple);
+                    persons[GlobalDatas.croom.playerStatus.Length - GlobalDatas.myIndex + i].setGrab(doubles.multiple);
                     break;
                 }
             }
@@ -191,6 +205,7 @@ public class GameRoom : MonoBehaviour
         });
 
         sioCom.Instance.Emit("is ready");
+        sioCom.Instance.Emit("room status");
     }
 
     public void bet(int multiple)
@@ -208,8 +223,6 @@ public class GameRoom : MonoBehaviour
 
     private IEnumerator game_start_enum()
     {
-        int playerIndex = getplayerIndex();
-        GlobalDatas.myIndex = playerIndex;
         Cards.SetBool("flag", true);
         yield return new WaitForSeconds(1f);
 
@@ -221,13 +234,13 @@ public class GameRoom : MonoBehaviour
         Cards.SetBool("flag", false);
         yield return new WaitForSeconds(0.2f);
 
-        for (int i = playerIndex; i < GlobalDatas.croom.players.Length; i++)
+        for (int i = GlobalDatas.myIndex; i < GlobalDatas.croom.playerStatus.Length; i++)
         {
-            StartCoroutine(persons[i - playerIndex].setCardEnumerator(GlobalDatas.croom.playerStatus[i].cards));
+            StartCoroutine(persons[i - GlobalDatas.myIndex].setCardEnumerator(GlobalDatas.croom.playerStatus[i].cards));
         }
-        for (int i = 0; i < playerIndex; i++)
+        for (int i = 0; i < GlobalDatas.myIndex; i++)
         {
-            StartCoroutine(persons[playerIndex + i].setCardEnumerator(GlobalDatas.croom.playerStatus[i].cards));
+            StartCoroutine(persons[GlobalDatas.croom.playerStatus.Length - GlobalDatas.myIndex + i].setCardEnumerator(GlobalDatas.croom.playerStatus[i].cards));
         }
         yield return new WaitForSeconds(0.8f);
     }
@@ -237,28 +250,17 @@ public class GameRoom : MonoBehaviour
         GlobalDatas.myIndex = playerIndex;
         for (int i = playerIndex; i < GlobalDatas.croom.playerStatus.Length; i++)
         {
-            StartCoroutine(persons[i - playerIndex].setCardEnumerator(GlobalDatas.croom.playerStatus[i].cards));
+            StartCoroutine(persons[i - playerIndex + 1].setCardEnumerator(GlobalDatas.croom.playerStatus[i].cards));
         }
         for (int i = 0; i < playerIndex; i++)
         {
-            StartCoroutine(persons[i + playerIndex].setCardEnumerator(GlobalDatas.croom.playerStatus[i].cards));
+            StartCoroutine(persons[GlobalDatas.croom.playerStatus.Length - playerIndex + i].setCardEnumerator(GlobalDatas.croom.playerStatus[i].cards));
         }
+
+        yield return new WaitForSeconds(0.8f);
 
         showEffect();
-        yield return new WaitForSeconds(6f);
-
-        for (int i = 0; i < GlobalDatas.croom.playerStatus.Length; i++)
-        {
-            persons[i].resetGrab();
-        }
-        for (int i = 0; i < GlobalDatas.croom.playerStatus.Length; i++)
-        {
-            persons[i].resetBanker();
-        }
-        for (int i = 0; i < GlobalDatas.croom.playerStatus.Length; i++)
-        {
-            StartCoroutine(persons[i].cardClear());
-        }
+        yield return new WaitForSeconds(5f);
     }
 
     // utils
@@ -285,7 +287,7 @@ public class GameRoom : MonoBehaviour
     {
         int bankerIndex = 0;
         float[] result = new float[6];
-        for(int i = 0; i < GlobalDatas.croom.players.Length; i++)
+        for(int i = 0; i < GlobalDatas.croom.playerStatus.Length; i++)
         {
             if(GlobalDatas.croom.playerStatus[i].role == "banker")
             {
@@ -293,9 +295,9 @@ public class GameRoom : MonoBehaviour
                 break;
             }
         }
-        for (int i = 0; i < GlobalDatas.croom.players.Length; i++)
+        for (int i = 0; i < GlobalDatas.croom.playerStatus.Length; i++)
         {
-            if (bankerIndex != i)
+            if (GlobalDatas.croom.playerStatus[i].role == "idler")
             {
                 if(GlobalDatas.croom.playerStatus[bankerIndex].roundScore.score > GlobalDatas.croom.playerStatus[i].roundScore.score)
                 {
@@ -321,9 +323,9 @@ public class GameRoom : MonoBehaviour
         for (int i = 0; i < GlobalDatas.myIndex; i++)
         {
             if (result[i] > 0)
-                persons[i + GlobalDatas.myIndex].setEarn("+" + result[i].ToString());
+                persons[GlobalDatas.croom.playerStatus.Length - GlobalDatas.myIndex + i].setEarn("+" + result[i].ToString());
             else
-                persons[i + GlobalDatas.myIndex].setEarn(result[i].ToString());
+                persons[GlobalDatas.croom.playerStatus.Length - GlobalDatas.myIndex + i].setEarn(result[i].ToString());
         }
     }
 }

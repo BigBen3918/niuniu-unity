@@ -11,6 +11,7 @@ public class UserPerson : MonoBehaviour
     public RawImage image;
     public Sprite[] spade, heart, club, diamond;
     public Sprite back;
+    public Texture userBack;
     public Animator cardAnimator;
 
     private void Start()
@@ -35,6 +36,12 @@ public class UserPerson : MonoBehaviour
     {
         username.text = _balance.ToString();
         balance.text = _username;
+    }
+    public void resetUserInfo()
+    {
+        username.text = "点击坐下";
+        balance.text = "点击坐下";
+        image.texture = userBack;
     }
 
     // game actions
@@ -67,7 +74,26 @@ public class UserPerson : MonoBehaviour
             image.texture = coverImage;
         }));
     }
-    // init state
+    public void resetImage()
+    {
+        image.texture = userBack;
+    }
+    // activate cards
+    public void actionCard(int[] arr)
+    {
+        for(int i = 0; i < arr.Length; i++)
+        {
+            cardsObject.GetChild(arr[i]).GetComponent<Image>().color = new Color32(255, 97, 113, 255);
+        }
+    }
+
+    public void resetAcionCard()
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            cardsObject.GetChild(i).GetComponent<Image>().color = new Color32(255, 255, 255, 255);
+        }
+    }
 
     // Enumerator Controller
     public IEnumerator cardInitial()
@@ -78,6 +104,7 @@ public class UserPerson : MonoBehaviour
 
     public IEnumerator setCardEnumerator(int[] _cards)
     {
+        Debug.Log(_cards);
         if(_cards.Length > 0)
             cardAnimator.SetBool("rotate_flag", true);
         yield return new WaitForSeconds(0.3f);

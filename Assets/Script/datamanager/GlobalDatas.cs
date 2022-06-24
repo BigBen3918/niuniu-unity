@@ -10,6 +10,7 @@ public class GlobalDatas
     public static UserLists users;
     public static RoomLists rooms;
     public static Room croom;
+    public static bool isStarted=false;
 
     public static string defaultUserImage = "";
 
