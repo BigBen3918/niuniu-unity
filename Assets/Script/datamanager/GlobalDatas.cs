@@ -77,6 +77,7 @@ public class User
     public int grab = -1;
     public string id;
     public string role;
+    public bool onRound;
     public RoundScore roundScore;
 
     // auth
@@ -85,7 +86,7 @@ public class User
     public string image;
     public float balance;
 
-    public User(string username, string id, string image = "", string phonenumber = "", int grab = -1, int doubles = -1,string role = "", int[] cards = null, float balance = 0f)
+    public User(string username, string id, string image = "", string phonenumber = "", int grab = -1, int doubles = -1,string role = "", int[] cards = null, float balance = 0f, bool onRound = false)
     {
         this.username = username;
         this.id = id;
@@ -96,6 +97,7 @@ public class User
         this.role = role;
         this.cards = cards;
         this.balance = balance;
+        this.onRound = onRound;
     }
 
     public User(User _userinfo)
@@ -108,6 +110,7 @@ public class User
         this.doubles = _userinfo.doubles;
         this.role = _userinfo.role;
         this.balance = _userinfo.balance;
+        this.onRound = _userinfo.onRound;
     }
 }
 

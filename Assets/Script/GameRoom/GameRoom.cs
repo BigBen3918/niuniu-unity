@@ -8,16 +8,16 @@ using SimpleJSON;
 
 public class GameRoom : MonoBehaviour
 {
-    public Animator Cards;
+    public Animator Cards, win_lose;
     public SocketIOCommunicator sioCom;
     public Sprite[] spade, heart, club, diamond;
     public Text roomNumber, bonus;
     public GameObject grabPanel;
     public GameObject multiplePanel;
+    public bool grabFlag;
 
     /*------------------- -------------------*/
     public UserPerson[] persons;
-    public Sprite back;
 
     void Awake()
     {
@@ -30,13 +30,14 @@ public class GameRoom : MonoBehaviour
     void Start()
     {
         OnRoomData();
+        grabFlag = false;
     }
 
     private void Update()
     {
         grabPanel.SetActive(false);
         multiplePanel.SetActive(false);
-        if (GlobalDatas.croom.gameStatus == 1)
+        if (GlobalDatas.croom.gameStatus == 1 && grabFlag == true && GlobalDatas.croom.players[GlobalDatas.myIndex].onRound == true)
         {
             int userIndex = getplayerIndex();
             if (GlobalDatas.croom.playerStatus[userIndex].grab == -1)
@@ -44,7 +45,7 @@ public class GameRoom : MonoBehaviour
                 grabPanel.SetActive(true);
             }
         }
-        else if (GlobalDatas.croom.gameStatus == 2)
+        else if (GlobalDatas.croom.gameStatus == 2 && GlobalDatas.croom.players[GlobalDatas.myIndex].onRound == true)
         {
             int userIndex = getplayerIndex();
             if (GlobalDatas.croom.playerStatus[userIndex].doubles == -1 && GlobalDatas.croom.playerStatus[userIndex].role != "banker")
@@ -96,27 +97,34 @@ public class GameRoom : MonoBehaviour
             GlobalDatas.croom = room;
 
             loadUserInfo();
-            if (GlobalDatas.isStarted == true)
+            if (GlobalDatas.isStarted == true && GlobalDatas.croom.players[GlobalDatas.myIndex].onRound == true)
             {
+                win_lose.SetBool("win_flag", false);
+                win_lose.SetBool("lose_flag", false);
+
                 for (int i = 0; i < 6; i++)
                 {
                     persons[i].resetGrab();
                     persons[i].resetBanker();
                     persons[i].resetAcionCard();
+                    persons[i].resetType();
                     StartCoroutine(persons[i].cardClear());
                 }
 
                 GlobalDatas.isStarted = false;
                 StartCoroutine(game_start_enum());
             }
-            if (room.gameStatus == 2)
+            if(room.gameStatus == 1)
+            {
+                grabFlag = false;
+            }
+            if (room.gameStatus == 2 && GlobalDatas.croom.players[GlobalDatas.myIndex].onRound == true)
             {
                 // reset grab
                 for (int i = 0; i < 6; i++)
                 {
                     persons[i].resetGrab();
                 }
-                 
                 // set banker
                 for (int i = GlobalDatas.myIndex; i < GlobalDatas.croom.players.Length; i++)
                 {
@@ -129,7 +137,7 @@ public class GameRoom : MonoBehaviour
                         persons[GlobalDatas.croom.playerStatus.Length - GlobalDatas.myIndex + i].setBanker();
                 }
             }
-            if(room.gameStatus == 5)
+            if(room.gameStatus == 5 && GlobalDatas.croom.players[GlobalDatas.myIndex].onRound == true)
             {
                 StartCoroutine(game_end_enum());
             }
@@ -217,6 +225,7 @@ public class GameRoom : MonoBehaviour
         else if(GlobalDatas.croom.gameStatus == 2)
         {
             sioCom.Instance.Emit("doubles", JsonUtility.ToJson(grab), false);
+            multiplePanel.SetActive(false);
         }
     }
 
@@ -242,9 +251,11 @@ public class GameRoom : MonoBehaviour
             StartCoroutine(persons[GlobalDatas.croom.playerStatus.Length - GlobalDatas.myIndex + i].setCardEnumerator(GlobalDatas.croom.playerStatus[i].cards));
         }
         yield return new WaitForSeconds(0.8f);
+        grabFlag = true;
     }
     private IEnumerator game_end_enum()
     {
+        // all cards show
         int playerIndex = getplayerIndex();
         GlobalDatas.myIndex = playerIndex;
         for (int i = playerIndex; i < GlobalDatas.croom.playerStatus.Length; i++)
@@ -255,10 +266,35 @@ public class GameRoom : MonoBehaviour
         {
             StartCoroutine(persons[GlobalDatas.croom.playerStatus.Length - playerIndex + i].setCardEnumerator(GlobalDatas.croom.playerStatus[i].cards));
         }
+        yield return new WaitForSeconds(1f);
 
-        yield return new WaitForSeconds(0.8f);
+        // Show Activate Cards
+        int[] activeCards;
+        for (int i = playerIndex; i < GlobalDatas.croom.playerStatus.Length; i++)
+        {
+            int activityCardLen = GlobalDatas.croom.playerStatus[i].roundScore.activityCards.Length;
+            activeCards = new int[activityCardLen];
+            for (int j = 0; j < activityCardLen; j++)
+            {
+                int index = System.Array.IndexOf(GlobalDatas.croom.playerStatus[i].roundScore.cards, GlobalDatas.croom.playerStatus[i].roundScore.activityCards[j]);
+                activeCards[j] = index;
+            }
+            persons[i - playerIndex].actionCard(activeCards);
+        }
+        for (int i = 0; i < playerIndex; i++)
+        {
+            int activityCardLen = GlobalDatas.croom.playerStatus[i].roundScore.activityCards.Length;
+            activeCards = new int[activityCardLen];
+            for (int j = 0; j < activityCardLen; j++)
+            {
+                int index = System.Array.IndexOf(GlobalDatas.croom.playerStatus[i].roundScore.cards, GlobalDatas.croom.playerStatus[i].roundScore.activityCards[j]);
+                activeCards[j] = index;
+            }
+            persons[GlobalDatas.croom.playerStatus.Length - playerIndex + i].actionCard(activeCards);
+        }
+        yield return new WaitForSeconds(1f);
 
-        showEffect();
+        showEffect();   // earn money show
         yield return new WaitForSeconds(5f);
     }
 
@@ -284,6 +320,7 @@ public class GameRoom : MonoBehaviour
 
     public void showEffect()
     {
+        // calculate earn realmoneyA
         int bankerIndex = 0;
         float[] result = new float[6];
         for(int i = 0; i < GlobalDatas.croom.playerStatus.Length; i++)
@@ -312,8 +349,19 @@ public class GameRoom : MonoBehaviour
                 }
             }
         }
+
+        if (result[GlobalDatas.myIndex] > 0 && GlobalDatas.croom.players[GlobalDatas.myIndex].onRound == true)
+        {
+            win_lose.SetBool("win_flag", true);
+        }
+        else if(result[GlobalDatas.myIndex] < 0 && GlobalDatas.croom.players[GlobalDatas.myIndex].onRound == true)
+        {
+            win_lose.SetBool("lose_flag", true);
+        }
+
         for (int i = GlobalDatas.myIndex; i < GlobalDatas.croom.players.Length; i++)
         {
+            persons[i - GlobalDatas.myIndex].setType(GlobalDatas.croom.playerStatus[i].roundScore.type.ToString());
             if(result[i] > 0)
                 persons[i - GlobalDatas.myIndex].setEarn("+" + result[i].ToString());
             else
@@ -321,6 +369,7 @@ public class GameRoom : MonoBehaviour
         }
         for (int i = 0; i < GlobalDatas.myIndex; i++)
         {
+            persons[GlobalDatas.croom.playerStatus.Length - GlobalDatas.myIndex + i].setType(GlobalDatas.croom.playerStatus[i].roundScore.type.ToString());
             if (result[i] > 0)
                 persons[GlobalDatas.croom.playerStatus.Length - GlobalDatas.myIndex + i].setEarn("+" + result[i].ToString());
             else

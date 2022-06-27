@@ -9,10 +9,10 @@ public class UserPerson : MonoBehaviour
     public Transform userImageObject, cardsObject;
     public Transform bankerMark;
     public RawImage image;
-    public Sprite[] spade, heart, club, diamond;
+    public Sprite[] spade, heart, club, diamond, types;
     public Sprite back;
     public Texture userBack;
-    public Animator cardAnimator;
+    public Animator cardAnimator, typeAnimator;
 
     private void Start()
     {
@@ -23,6 +23,7 @@ public class UserPerson : MonoBehaviour
         cardsObject = transform.GetChild(2);
         bankerMark = transform.GetChild(3).GetChild(1);
         cardAnimator = transform.GetChild(2).GetComponent<Animator>();
+        typeAnimator = transform.GetChild(3).GetComponent<Animator>();
         image = transform.GetChild(1).GetChild(0).GetComponent<RawImage>();
 
         GameRoom roomManager = GameObject.Find("RoomManager").GetComponent<GameRoom>();
@@ -31,7 +32,7 @@ public class UserPerson : MonoBehaviour
         club = roomManager.club;
         diamond = roomManager.diamond;
     }
-    // before game
+    // userinfos actions
     public void setUserInfo(float _balance, string _username)
     {
         username.text = _balance.ToString();
@@ -44,7 +45,7 @@ public class UserPerson : MonoBehaviour
         image.texture = userBack;
     }
 
-    // game actions
+    // grab actions
     public void setGrab(int i)
     {
         if (i == 0) multiple.text = "不抢";
@@ -54,6 +55,8 @@ public class UserPerson : MonoBehaviour
     {
         multiple.text = "";
     }
+
+    // banker mark actions
     public void setBanker()
     {
         bankerMark.gameObject.SetActive(true);
@@ -62,10 +65,14 @@ public class UserPerson : MonoBehaviour
     {
         bankerMark.gameObject.SetActive(false);
     }
+
+    // earn money actions
     public void setEarn(string earn)
     {
         multiple.text = earn;
     }
+
+    // card images actions
     public void setImage(string url)
     {
         StartCoroutine(ExtensionMethods.GetTextureFromURL(url, (Texture2D coverImage, bool isSuccess) =>
@@ -78,12 +85,184 @@ public class UserPerson : MonoBehaviour
     {
         image.texture = userBack;
     }
-    // activate cards
+
+    // type show actions
+    public void setType(string type)
+    {
+        Transform effect = transform.GetChild(3).GetChild(2);
+        effect.GetChild(0).gameObject.SetActive(true);
+        effect.GetChild(1).gameObject.SetActive(true);
+        effect.GetChild(2).gameObject.SetActive(true);
+        effect.GetChild(3).gameObject.SetActive(true);
+        effect.GetChild(4).gameObject.SetActive(true);
+        effect.GetChild(5).gameObject.SetActive(true);
+        switch (type)
+        {
+            case "NoBull":
+                effect.GetChild(0).gameObject.SetActive(false);
+                effect.GetChild(1).gameObject.SetActive(false);
+                effect.GetChild(2).GetComponent<Image>().sprite = types[27];
+                effect.GetChild(3).GetComponent<Image>().sprite = types[28];
+                effect.GetChild(4).gameObject.SetActive(false);
+                effect.GetChild(5).gameObject.SetActive(false);
+                break;
+            case "Cattle1":
+                effect.GetChild(0).gameObject.SetActive(false);
+                effect.GetChild(1).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(2).GetComponent<Image>().sprite = types[10];
+                effect.GetChild(3).gameObject.SetActive(false);
+                effect.GetChild(4).gameObject.SetActive(true);
+                effect.GetChild(5).GetComponent<Image>().sprite = types[1];
+                break;
+            case "Cattle2":
+                effect.GetChild(0).gameObject.SetActive(false);
+                effect.GetChild(1).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(2).GetComponent<Image>().sprite = types[11];
+                effect.GetChild(3).gameObject.SetActive(false);
+                effect.GetChild(4).gameObject.SetActive(true);
+                effect.GetChild(5).GetComponent<Image>().sprite = types[1];
+                break;
+            case "Cattle3":
+                effect.GetChild(0).gameObject.SetActive(false);
+                effect.GetChild(1).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(2).GetComponent<Image>().sprite = types[12];
+                effect.GetChild(3).gameObject.SetActive(false);
+                effect.GetChild(4).gameObject.SetActive(true);
+                effect.GetChild(5).GetComponent<Image>().sprite = types[1];
+                break;
+            case "Cattle4":
+                effect.GetChild(0).gameObject.SetActive(false);
+                effect.GetChild(1).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(2).GetComponent<Image>().sprite = types[13];
+                effect.GetChild(3).gameObject.SetActive(false);
+                effect.GetChild(4).gameObject.SetActive(true);
+                effect.GetChild(5).GetComponent<Image>().sprite = types[1];
+                break;
+            case "Cattle5":
+                effect.GetChild(0).gameObject.SetActive(false);
+                effect.GetChild(1).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(2).GetComponent<Image>().sprite = types[14];
+                effect.GetChild(3).gameObject.SetActive(false);
+                effect.GetChild(4).gameObject.SetActive(true);
+                effect.GetChild(5).GetComponent<Image>().sprite = types[1];
+                break;
+            case "Cattle6":
+                effect.GetChild(0).gameObject.SetActive(false);
+                effect.GetChild(1).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(2).GetComponent<Image>().sprite = types[15];
+                effect.GetChild(3).gameObject.SetActive(false);
+                effect.GetChild(4).gameObject.SetActive(true);
+                effect.GetChild(5).GetComponent<Image>().sprite = types[1];
+                break;
+            case "Cattle7":
+                effect.GetChild(0).gameObject.SetActive(false);
+                effect.GetChild(1).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(2).GetComponent<Image>().sprite = types[16];
+                effect.GetChild(3).gameObject.SetActive(false);
+                effect.GetChild(4).gameObject.SetActive(true);
+                effect.GetChild(5).GetComponent<Image>().sprite = types[2];
+                break;
+            case "Cattle8":
+                effect.GetChild(0).gameObject.SetActive(false);
+                effect.GetChild(1).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(2).GetComponent<Image>().sprite = types[17];
+                effect.GetChild(3).gameObject.SetActive(false);
+                effect.GetChild(4).gameObject.SetActive(true);
+                effect.GetChild(5).GetComponent<Image>().sprite = types[2];
+                break;
+            case "Cattle9":
+                effect.GetChild(0).gameObject.SetActive(false);
+                effect.GetChild(1).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(2).GetComponent<Image>().sprite = types[18];
+                effect.GetChild(3).gameObject.SetActive(false);
+                effect.GetChild(4).gameObject.SetActive(true);
+                effect.GetChild(5).GetComponent<Image>().sprite = types[3];
+                break;
+            case "NiuNiu":
+                effect.GetChild(0).gameObject.SetActive(false);
+                effect.GetChild(1).gameObject.SetActive(false);
+                effect.GetChild(2).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(3).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(4).gameObject.SetActive(true);
+                effect.GetChild(5).GetComponent<Image>().sprite = types[4];
+                break;
+            case "GoldBull":
+                effect.GetChild(0).gameObject.SetActive(false);
+                effect.GetChild(1).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(2).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(3).gameObject.SetActive(false);
+                effect.GetChild(4).gameObject.SetActive(true);
+                effect.GetChild(5).GetComponent<Image>().sprite = types[4];
+                break;
+            case "GoldBullion":
+                effect.GetChild(0).gameObject.SetActive(false);
+                effect.GetChild(1).gameObject.SetActive(false);
+                effect.GetChild(2).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(3).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(4).gameObject.SetActive(true);
+                effect.GetChild(5).GetComponent<Image>().sprite = types[4];
+                break;
+            case "Straight":
+                effect.GetChild(0).gameObject.SetActive(false);
+                effect.GetChild(1).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(2).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(3).gameObject.SetActive(false);
+                effect.GetChild(4).gameObject.SetActive(true);
+                effect.GetChild(5).GetComponent<Image>().sprite = types[5];
+                break;
+            case "FullHouse":
+                effect.GetChild(0).gameObject.SetActive(false);
+                effect.GetChild(1).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(2).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(3).gameObject.SetActive(false);
+                effect.GetChild(4).gameObject.SetActive(true);
+                effect.GetChild(5).GetComponent<Image>().sprite = types[6];
+                break;
+            case "TenSmall":
+                effect.GetChild(0).gameObject.SetActive(false);
+                effect.GetChild(1).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(2).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(3).gameObject.SetActive(false);
+                effect.GetChild(4).gameObject.SetActive(true);
+                effect.GetChild(5).GetComponent<Image>().sprite = types[7];
+                break;
+            case "Forty":
+                effect.GetChild(0).gameObject.SetActive(false);
+                effect.GetChild(1).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(2).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(3).gameObject.SetActive(false);
+                effect.GetChild(4).gameObject.SetActive(true);
+                effect.GetChild(5).GetComponent<Image>().sprite = types[7];
+                break;
+            case "BombBull":
+                effect.GetChild(0).gameObject.SetActive(false);
+                effect.GetChild(1).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(2).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(3).gameObject.SetActive(false);
+                effect.GetChild(4).gameObject.SetActive(true);
+                effect.GetChild(5).GetComponent<Image>().sprite = types[8];
+                break;
+            default:
+                break;
+        }
+        typeAnimator.SetBool("flag", true);
+        effect.gameObject.SetActive(true);
+    }
+    public void resetType()
+    {
+        transform.GetChild(3).GetChild(2).gameObject.SetActive(false);
+        typeAnimator.SetBool("flag", false);
+    }
+
+    // activate cards actions
     public void actionCard(int[] arr)
     {
         for(int i = 0; i < arr.Length; i++)
         {
-            cardsObject.GetChild(arr[i]).GetComponent<Image>().color = new Color32(255, 97, 113, 255);
+            if (arr[i] != 5)
+            {
+                cardsObject.GetChild(arr[i]).GetComponent<Image>().color = new Color32(255, 100, 0, 255);
+            }
         }
     }
 
@@ -101,7 +280,6 @@ public class UserPerson : MonoBehaviour
         cardAnimator.SetBool("flag", true);
         yield return new WaitForSeconds(1f);
     }
-
     public IEnumerator setCardEnumerator(int[] _cards)
     {
         if(_cards.Length > 0)
