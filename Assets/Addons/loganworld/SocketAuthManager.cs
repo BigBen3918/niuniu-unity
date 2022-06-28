@@ -77,14 +77,23 @@ public class SocketAuthManager : MonoBehaviour
 [Serializable]
 public class AuthInfo
 {
+    public string id;
     public string username;
     public string password;
     public string phonenumber;
-    public AuthInfo(string username, string phonenumber, string password = "")
+    public float balance;
+    public float score;
+    public string image;
+
+    public AuthInfo(string username, string phonenumber, string password = "", float balance = 0f, float score = 0f, string image = "", string id = "")
     {
+        this.id = id;
         this.username = username;
         this.phonenumber = phonenumber;
         this.password = password;
+        this.balance = balance;
+        this.score = score;
+        this.image = image;
     }
 
     public static AuthInfo CreateFromJSON(string data)
@@ -94,8 +103,12 @@ public class AuthInfo
 
     public AuthInfo(AuthInfo authdata)
     {
+        this.id = authdata.id;
         this.username = authdata.username;
         this.phonenumber = authdata.phonenumber;
         this.password = authdata.password;
+        this.balance = authdata.balance;
+        this.score = authdata.score;
+        this.image = authdata.image;
     }
 }

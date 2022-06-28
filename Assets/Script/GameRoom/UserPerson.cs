@@ -187,32 +187,32 @@ public class UserPerson : MonoBehaviour
                 effect.GetChild(5).GetComponent<Image>().sprite = types[4];
                 break;
             case "GoldBull":
-                effect.GetChild(0).gameObject.SetActive(false);
-                effect.GetChild(1).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(0).GetComponent<Image>().sprite = types[29];
+                effect.GetChild(1).GetComponent<Image>().sprite = types[30];
                 effect.GetChild(2).GetComponent<Image>().sprite = types[26];
                 effect.GetChild(3).gameObject.SetActive(false);
                 effect.GetChild(4).gameObject.SetActive(true);
                 effect.GetChild(5).GetComponent<Image>().sprite = types[4];
                 break;
             case "GoldBullion":
-                effect.GetChild(0).gameObject.SetActive(false);
-                effect.GetChild(1).gameObject.SetActive(false);
+                effect.GetChild(0).GetComponent<Image>().sprite = types[29];
+                effect.GetChild(1).GetComponent<Image>().sprite = types[30];
                 effect.GetChild(2).GetComponent<Image>().sprite = types[26];
                 effect.GetChild(3).GetComponent<Image>().sprite = types[26];
                 effect.GetChild(4).gameObject.SetActive(true);
                 effect.GetChild(5).GetComponent<Image>().sprite = types[4];
                 break;
             case "Straight":
-                effect.GetChild(0).gameObject.SetActive(false);
-                effect.GetChild(1).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(0).GetComponent<Image>().sprite = types[23];
+                effect.GetChild(1).GetComponent<Image>().sprite = types[25];
                 effect.GetChild(2).GetComponent<Image>().sprite = types[26];
                 effect.GetChild(3).gameObject.SetActive(false);
                 effect.GetChild(4).gameObject.SetActive(true);
                 effect.GetChild(5).GetComponent<Image>().sprite = types[5];
                 break;
             case "FullHouse":
-                effect.GetChild(0).gameObject.SetActive(false);
-                effect.GetChild(1).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(0).GetComponent<Image>().sprite = types[22];
+                effect.GetChild(1).GetComponent<Image>().sprite = types[21];
                 effect.GetChild(2).GetComponent<Image>().sprite = types[26];
                 effect.GetChild(3).gameObject.SetActive(false);
                 effect.GetChild(4).gameObject.SetActive(true);
@@ -220,15 +220,15 @@ public class UserPerson : MonoBehaviour
                 break;
             case "TenSmall":
                 effect.GetChild(0).gameObject.SetActive(false);
-                effect.GetChild(1).GetComponent<Image>().sprite = types[26];
-                effect.GetChild(2).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(1).GetComponent<Image>().sprite = types[19];
+                effect.GetChild(2).GetComponent<Image>().sprite = types[31];
                 effect.GetChild(3).gameObject.SetActive(false);
                 effect.GetChild(4).gameObject.SetActive(true);
                 effect.GetChild(5).GetComponent<Image>().sprite = types[7];
                 break;
             case "Forty":
                 effect.GetChild(0).gameObject.SetActive(false);
-                effect.GetChild(1).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(1).GetComponent<Image>().sprite = types[13];
                 effect.GetChild(2).GetComponent<Image>().sprite = types[26];
                 effect.GetChild(3).gameObject.SetActive(false);
                 effect.GetChild(4).gameObject.SetActive(true);
@@ -237,7 +237,7 @@ public class UserPerson : MonoBehaviour
             case "BombBull":
                 effect.GetChild(0).gameObject.SetActive(false);
                 effect.GetChild(1).GetComponent<Image>().sprite = types[26];
-                effect.GetChild(2).GetComponent<Image>().sprite = types[26];
+                effect.GetChild(2).GetComponent<Image>().sprite = types[19];
                 effect.GetChild(3).gameObject.SetActive(false);
                 effect.GetChild(4).gameObject.SetActive(true);
                 effect.GetChild(5).GetComponent<Image>().sprite = types[8];

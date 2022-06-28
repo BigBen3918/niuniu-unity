@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: d5cd69dbcf3afde4194e106f71750831
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - DFZongYiW9-GB
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 835df1408825f1b4f8480a486ce8f08b, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

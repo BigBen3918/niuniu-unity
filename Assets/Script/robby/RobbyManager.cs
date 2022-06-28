@@ -11,6 +11,8 @@ public class RobbyManager : MonoBehaviour
     public SocketIOCommunicator sioCom;
     //room create
     public InputField cost_field;
+    public Text balance, score, username, userid;
+    public RawImage userImage;
 
     void Awake()
     {
@@ -23,6 +25,20 @@ public class RobbyManager : MonoBehaviour
     {
         //sioCom.Instance.Emit("enter lobby");
         OnRoomData();
+        screenInit();
+    }
+
+    public void screenInit()
+    {
+        balance.text = GlobalDatas.authdata.balance.ToString();
+        score.text = GlobalDatas.authdata.score.ToString();
+        username.text = GlobalDatas.authdata.username;
+        userid.text = GlobalDatas.authdata.id;
+        StartCoroutine(ExtensionMethods.GetTextureFromURL(GlobalDatas.authdata.image, (Texture2D coverImage, bool isSuccess) =>
+        {
+            if (!isSuccess) return;
+            userImage.texture = coverImage;
+        }));
     }
 
     // set robby list data
@@ -54,7 +70,6 @@ public class RobbyManager : MonoBehaviour
         sioCom.Instance.On("rooms", (string data) =>
         {
             GlobalDatas.rooms = JsonUtility.FromJson<RoomLists>(data);
-            SetRoomList();
         });
 
         // when user join to room
@@ -64,9 +79,16 @@ public class RobbyManager : MonoBehaviour
             GlobalDatas.croom = room;
             sioCom.Instance.Off("rooms");
             sioCom.Instance.Off("entered room");
+            sioCom.Instance.Off("get user");
             SceneManager.LoadScene(2);
         });
+        
+        sioCom.Instance.On("get user", (string data) =>{
+            AuthInfo authdata = AuthInfo.CreateFromJSON(data);
+            GlobalDatas.SetAuth(authdata);
+        });
 
+        sioCom.Instance.Emit("get user");
         sioCom.Instance.Emit("get rooms");
     }
 
@@ -114,6 +136,7 @@ public class RobbyManager : MonoBehaviour
                 hall_item.SetActive(false);
                 lobby.SetActive(true);
                 lobby_item.SetActive(true);
+                SetRoomList();
                 break;
             case 2:     // enter in rooom
                 Dialog.SetActive(true);

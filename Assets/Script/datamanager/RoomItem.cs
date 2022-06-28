@@ -1,14 +1,12 @@
 using UnityEngine;
-using System;
 using TMPro;
 using UnityEngine.UI;
+
 public class RoomItem : MonoBehaviour
 {
     public Room roominfo;
 
-    public TextMeshProUGUI id_field;
-    public TextMeshProUGUI setting_field;
-    public TextMeshProUGUI cost_field;
+    public Text id_field, setting_field, cost_field;
     public Transform[] players;
 
     void Start()
@@ -18,11 +16,23 @@ public class RoomItem : MonoBehaviour
 
     public void setRoomInfo(Room _userinfo)
     {
-        //set room info
+        // set room info
         roominfo = new Room(_userinfo);
-        id_field.text = roominfo.id;
+        id_field.text = Random.Range(30000, 80000).ToString();
         setting_field.text = roominfo.setting;
         cost_field.text = (roominfo.cost).ToString();
+
+        Debug.Log(roominfo.players.Length);
+
+        for (int i = 0; i < roominfo.players.Length; i++)
+        {
+            Debug.Log(roominfo.players[i].image);
+            StartCoroutine(ExtensionMethods.GetTextureFromURL(roominfo.players[i].image, (Texture2D coverImage, bool isSuccess) =>
+            {
+                if (!isSuccess) return;
+                players[i].GetChild(0).GetComponent<RawImage>().texture = coverImage;
+            }));
+        }
     }
 
     public void getRoomInfo()

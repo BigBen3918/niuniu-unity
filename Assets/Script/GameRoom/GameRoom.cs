@@ -37,7 +37,7 @@ public class GameRoom : MonoBehaviour
     {
         grabPanel.SetActive(false);
         multiplePanel.SetActive(false);
-        if (GlobalDatas.croom.gameStatus == 1 && grabFlag == true && GlobalDatas.croom.players[GlobalDatas.myIndex].onRound == true)
+        if (GlobalDatas.croom.gameStatus == 1 && grabFlag == true)
         {
             int userIndex = getplayerIndex();
             if (GlobalDatas.croom.playerStatus[userIndex].grab == -1)
@@ -45,7 +45,7 @@ public class GameRoom : MonoBehaviour
                 grabPanel.SetActive(true);
             }
         }
-        else if (GlobalDatas.croom.gameStatus == 2 && GlobalDatas.croom.players[GlobalDatas.myIndex].onRound == true)
+        else if (GlobalDatas.croom.gameStatus == 2)
         {
             int userIndex = getplayerIndex();
             if (GlobalDatas.croom.playerStatus[userIndex].doubles == -1 && GlobalDatas.croom.playerStatus[userIndex].role != "banker")
@@ -97,7 +97,7 @@ public class GameRoom : MonoBehaviour
             GlobalDatas.croom = room;
 
             loadUserInfo();
-            if (GlobalDatas.isStarted == true && GlobalDatas.croom.players[GlobalDatas.myIndex].onRound == true)
+            if (GlobalDatas.isStarted == true)
             {
                 win_lose.SetBool("win_flag", false);
                 win_lose.SetBool("lose_flag", false);
@@ -118,7 +118,7 @@ public class GameRoom : MonoBehaviour
             {
                 grabFlag = false;
             }
-            if (room.gameStatus == 2 && GlobalDatas.croom.players[GlobalDatas.myIndex].onRound == true)
+            if (room.gameStatus == 2)
             {
                 // reset grab
                 for (int i = 0; i < 6; i++)
@@ -137,7 +137,7 @@ public class GameRoom : MonoBehaviour
                         persons[GlobalDatas.croom.playerStatus.Length - GlobalDatas.myIndex + i].setBanker();
                 }
             }
-            if(room.gameStatus == 5 && GlobalDatas.croom.players[GlobalDatas.myIndex].onRound == true)
+            if(room.gameStatus == 5)
             {
                 StartCoroutine(game_end_enum());
             }
@@ -350,11 +350,11 @@ public class GameRoom : MonoBehaviour
             }
         }
 
-        if (result[GlobalDatas.myIndex] > 0 && GlobalDatas.croom.players[GlobalDatas.myIndex].onRound == true)
+        if (result[GlobalDatas.myIndex] > 0)
         {
             win_lose.SetBool("win_flag", true);
         }
-        else if(result[GlobalDatas.myIndex] < 0 && GlobalDatas.croom.players[GlobalDatas.myIndex].onRound == true)
+        else if(result[GlobalDatas.myIndex] < 0)
         {
             win_lose.SetBool("lose_flag", true);
         }
