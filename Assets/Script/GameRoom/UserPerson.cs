@@ -12,7 +12,8 @@ public class UserPerson : MonoBehaviour
     public Sprite[] spade, heart, club, diamond, types;
     public Sprite back;
     public Texture userBack;
-    public Animator cardAnimator, typeAnimator;
+    public Animator cardAnimator, typeAnimator, bankerAnimator;
+    public GameObject loading;
 
     private void Start()
     {
@@ -24,7 +25,9 @@ public class UserPerson : MonoBehaviour
         bankerMark = transform.GetChild(3).GetChild(1);
         cardAnimator = transform.GetChild(2).GetComponent<Animator>();
         typeAnimator = transform.GetChild(3).GetComponent<Animator>();
+        bankerAnimator = transform.GetChild(4).GetComponent<Animator>();
         image = transform.GetChild(1).GetChild(0).GetComponent<RawImage>();
+        loading = transform.GetChild(5).gameObject;
 
         GameRoom roomManager = GameObject.Find("RoomManager").GetComponent<GameRoom>();
         spade = roomManager.spade;
@@ -41,7 +44,7 @@ public class UserPerson : MonoBehaviour
     public void resetUserInfo()
     {
         username.text = "点击坐下";
-        balance.text = "点击坐下";
+        balance.text = "";
         image.texture = userBack;
     }
 
@@ -50,6 +53,7 @@ public class UserPerson : MonoBehaviour
     {
         if (i == 0) multiple.text = "不抢";
         else multiple.text = i.ToString() + "x";
+        loading.SetActive(true);
     }
     public void resetGrab()
     {
@@ -60,30 +64,37 @@ public class UserPerson : MonoBehaviour
     public void setBanker()
     {
         bankerMark.gameObject.SetActive(true);
+        bankerAnimator.SetBool("flag", true);
     }
     public void resetBanker()
     {
         bankerMark.gameObject.SetActive(false);
+        bankerAnimator.SetBool("flag", false);
     }
 
     // earn money actions
     public void setEarn(string earn)
     {
-        multiple.text = earn;
+        
+         multiple.text = earn;
+        
     }
 
     // card images actions
     public void setImage(string url)
     {
         StartCoroutine(ExtensionMethods.GetTextureFromURL(url, (Texture2D coverImage, bool isSuccess) =>
-        {
-            if (!isSuccess) return;
-            image.texture = coverImage;
-        }));
-    }
-    public void resetImage()
     {
-        image.texture = userBack;
+        if (!isSuccess) return;
+        image.texture = coverImage;
+    }));
+    }
+
+    // loading actions
+
+    public void resetLoading()
+    {
+        loading.SetActive(false);
     }
 
     // type show actions
@@ -257,13 +268,14 @@ public class UserPerson : MonoBehaviour
     // activate cards actions
     public void actionCard(int[] arr)
     {
-        for(int i = 0; i < arr.Length; i++)
+        for (int i = 0; i < arr.Length; i++)
         {
             if (arr[i] != 5)
             {
                 cardsObject.GetChild(arr[i]).GetComponent<Image>().color = new Color32(255, 100, 0, 255);
             }
         }
+        
     }
 
     public void resetAcionCard()
@@ -277,12 +289,14 @@ public class UserPerson : MonoBehaviour
     // Enumerator Controller
     public IEnumerator cardInitial()
     {
+
         cardAnimator.SetBool("flag", true);
         yield return new WaitForSeconds(1f);
+
     }
     public IEnumerator setCardEnumerator(int[] _cards)
     {
-        if(_cards.Length > 0)
+        if (_cards.Length > 0)
             cardAnimator.SetBool("rotate_flag", true);
         yield return new WaitForSeconds(0.5f);
 

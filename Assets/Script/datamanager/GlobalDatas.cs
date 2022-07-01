@@ -85,8 +85,9 @@ public class User
     public string phonenumber;
     public string image;
     public float balance;
+    public float score;
 
-    public User(string username, string id, string image = "", string phonenumber = "", int grab = -1, int doubles = -1,string role = "", int[] cards = null, float balance = 0f, bool onRound = false)
+    public User(string username, string id, string image = "", string phonenumber = "", int grab = -1, int doubles = -1,string role = "", int[] cards = null, float balance = 0f, float score = 0f, bool onRound = false)
     {
         this.username = username;
         this.id = id;
@@ -98,6 +99,7 @@ public class User
         this.cards = cards;
         this.balance = balance;
         this.onRound = onRound;
+        this.score = score;
     }
 
     public User(User _userinfo)
@@ -110,6 +112,7 @@ public class User
         this.doubles = _userinfo.doubles;
         this.role = _userinfo.role;
         this.balance = _userinfo.balance;
+        this.score = _userinfo.score;
         this.onRound = _userinfo.onRound;
     }
 }
@@ -122,13 +125,15 @@ public class RoundScore
     public int multiple;
     public int[] cards;
     public int[] activityCards;
+    public bool onRound;
 
-    public RoundScore(string _type = "", float _score = 0f, int _multiple = -1, int[] _cards = null, int[] _activityCards = null)
+    public RoundScore(string _type = "", float _score = 0f, int _multiple = -1, int[] _cards = null, int[] _activityCards = null, bool _onRound = false)
     {
         this.type = _type;
         this.score = _score;
         this.multiple = _multiple;
         this.cards = _cards;
         this.activityCards = _activityCards;
+        this.onRound = _onRound;
     }
 }

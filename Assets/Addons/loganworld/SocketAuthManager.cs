@@ -77,7 +77,7 @@ public class SocketAuthManager : MonoBehaviour
 [Serializable]
 public class AuthInfo
 {
-    public string id;
+    public int id;
     public string username;
     public string password;
     public string phonenumber;
@@ -85,7 +85,7 @@ public class AuthInfo
     public float score;
     public string image;
 
-    public AuthInfo(string username, string phonenumber, string password = "", float balance = 0f, float score = 0f, string image = "", string id = "")
+    public AuthInfo(string username, string phonenumber, string password = "", float balance = 0f, float score = 0f, string image = "", int id = 0)
     {
         this.id = id;
         this.username = username;

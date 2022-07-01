@@ -1,4 +1,6 @@
 using UnityEngine;
+using System.Collections;
+using UnityEngine.Networking;
 using TMPro;
 using UnityEngine.UI;
 
@@ -22,16 +24,25 @@ public class RoomItem : MonoBehaviour
         setting_field.text = roominfo.setting;
         cost_field.text = (roominfo.cost).ToString();
 
-        Debug.Log(roominfo.players.Length);
-
         for (int i = 0; i < roominfo.players.Length; i++)
         {
-            Debug.Log(roominfo.players[i].image);
-            StartCoroutine(ExtensionMethods.GetTextureFromURL(roominfo.players[i].image, (Texture2D coverImage, bool isSuccess) =>
-            {
-                if (!isSuccess) return;
-                players[i].GetChild(0).GetComponent<RawImage>().texture = coverImage;
-            }));
+            string url = roominfo.players[i].image;
+            StartCoroutine(setImage(url, players[i]));
+        }
+    }
+
+    IEnumerator setImage(string url, Transform player)
+    {
+        UnityWebRequest www = UnityWebRequestTexture.GetTexture(url);
+        yield return www.SendWebRequest();
+
+        if (www.result != UnityWebRequest.Result.Success)
+        {
+            Debug.Log(www.error);
+        }
+        else
+        {
+            player.GetChild(0).GetComponent<RawImage>().texture = ((DownloadHandlerTexture)www.downloadHandler).texture;
         }
     }
 

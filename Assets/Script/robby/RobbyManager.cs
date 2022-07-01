@@ -25,15 +25,14 @@ public class RobbyManager : MonoBehaviour
     {
         //sioCom.Instance.Emit("enter lobby");
         OnRoomData();
-        screenInit();
     }
 
     public void screenInit()
     {
+        userid.text = GlobalDatas.authdata.id.ToString();
         balance.text = GlobalDatas.authdata.balance.ToString();
         score.text = GlobalDatas.authdata.score.ToString();
         username.text = GlobalDatas.authdata.username;
-        userid.text = GlobalDatas.authdata.id;
         StartCoroutine(ExtensionMethods.GetTextureFromURL(GlobalDatas.authdata.image, (Texture2D coverImage, bool isSuccess) =>
         {
             if (!isSuccess) return;
@@ -86,6 +85,7 @@ public class RobbyManager : MonoBehaviour
         sioCom.Instance.On("get user", (string data) =>{
             AuthInfo authdata = AuthInfo.CreateFromJSON(data);
             GlobalDatas.SetAuth(authdata);
+            screenInit();
         });
 
         sioCom.Instance.Emit("get user");
@@ -120,6 +120,11 @@ public class RobbyManager : MonoBehaviour
         sioCom.Instance.Emit("enter room", JsonUtility.ToJson(selectedRoom), false);
     }
 
+    public void referesh()
+    {
+        SetRoomList();
+    }
+
     // UI Management
     public void SwitchScreen(int flag)
     {
@@ -143,6 +148,12 @@ public class RobbyManager : MonoBehaviour
                 break;
             case 3:
                 Dialog.SetActive(false);
+                break;
+            case 4:
+                sioCom.Instance.Off("rooms");
+                sioCom.Instance.Off("entered room");
+                sioCom.Instance.Off("get user");
+                SceneManager.LoadScene(3);
                 break;
         }
     }
