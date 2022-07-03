@@ -1,9 +1,8 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System;
-using Firesplash.UnityAssets.SocketIO;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.Collections;
+using Firesplash.UnityAssets.SocketIO;
 using TMPro;
 
 public class GameRoom : MonoBehaviour
@@ -11,12 +10,11 @@ public class GameRoom : MonoBehaviour
     public Animator Cards, win_lose;
     public SocketIOCommunicator sioCom;
     public Sprite[] spade, heart, club, diamond;
-    public Text roomNumber, bonus;
+    public Text roomNumber, bonus, createTime;
     public TMP_Text poolBalance, poolTime;
-    public GameObject grabPanel;
-    public GameObject multiplePanel;
+    public GameObject multiplePanel, grabPanel, timer, coin;
     public bool grabFlag;
-    public GameObject timer;
+    public Transform coinParent;
 
     /*------------------- -------------------*/
     public UserPerson[] persons;
@@ -26,6 +24,7 @@ public class GameRoom : MonoBehaviour
         sioCom =
             FindObjectOfType(typeof(SocketIOCommunicator)) as
             SocketIOCommunicator;
+        createTime.text = System.DateTime.UtcNow.ToString("MM/dd/yyyy HH:mm");
     }
 
     // Start is called before the first frame update
@@ -46,12 +45,12 @@ public class GameRoom : MonoBehaviour
                 persons[i].resetBanker();
                 persons[i].resetAcionCard();
                 persons[i].resetType();
-                StartCoroutine(persons[i].cardClear());
+                StartCoroutine(persons[i].cardClear());  
             }
             win_lose.SetBool("win_flag", false);
             win_lose.SetBool("lose_flag", false);
         }
-        
+
         grabPanel.SetActive(false);
         multiplePanel.SetActive(false);
 
@@ -84,7 +83,7 @@ public class GameRoom : MonoBehaviour
         int playerIndex = getplayerIndex();
         GlobalDatas.myIndex = playerIndex;
         bonus.text = GlobalDatas.croom.cost.ToString();
-        roomNumber.text = GlobalDatas.croom.id.ToString();
+        roomNumber.text = GlobalDatas.croom.roomNumber.ToString();
         for (int i = playerIndex; i < GlobalDatas.croom.playerStatus.Length; i++)
         {
             persons[i - playerIndex].setUserInfo(GlobalDatas.croom.playerStatus[i].balance, GlobalDatas.croom.playerStatus[i].username);
@@ -231,7 +230,7 @@ public class GameRoom : MonoBehaviour
             sioCom.Instance.Off("room status");
             sioCom.Instance.Off("grabBank");
             sioCom.Instance.Off("endGrab");
-            sioCom.Instance.Off("double");
+            sioCom.Instance.Off("doubles");
             sioCom.Instance.Off("endRound");
             sioCom.Instance.Off("outed room");
             sioCom.Instance.Off("get pool");
@@ -246,19 +245,6 @@ public class GameRoom : MonoBehaviour
             int sec = pool.time - ((pool.time / 3600) * 3600) - (pool.time - (pool.time / 3600) * 3600) / 60 * 60;
             string remainTime = (hours < 10 ? "0" + hours.ToString() : hours.ToString()) + " : " + (mins < 10 ? "0" + mins.ToString() : mins.ToString()) + " : " + (sec < 10 ? "0" + sec.ToString() : sec.ToString());
             poolTime.text = remainTime;
-        });
-        sioCom.Instance.On("out user", (string data) =>
-        {
-            GlobalDatas.isStarted = false;
-            for (int i = 0; i < 6; i++)
-            {
-                persons[i].resetGrab();
-                persons[i].resetBanker();
-                persons[i].resetAcionCard();
-                persons[i].resetType();
-                StartCoroutine(persons[i].cardClear());
-            }
-            sioCom.Instance.Emit("room status");
         });
 
         sioCom.Instance.Emit("is ready");
@@ -396,6 +382,8 @@ public class GameRoom : MonoBehaviour
         // calculate earn realmoneyA
         int bankerIndex = 0;
         float[] result = new float[6];
+
+        // calculate win score
         for(int i = 0; i < GlobalDatas.croom.playerStatus.Length; i++)
         {
             if(GlobalDatas.croom.playerStatus[i].role == "banker")
@@ -423,6 +411,7 @@ public class GameRoom : MonoBehaviour
             }
         }
 
+        // show win logo
         if (result[GlobalDatas.myIndex] > 0 && GlobalDatas.croom.playerStatus[GlobalDatas.myIndex].onRound == true)
         {
             win_lose.SetBool("win_flag", true);
@@ -432,6 +421,37 @@ public class GameRoom : MonoBehaviour
             win_lose.SetBool("lose_flag", true);
         }
 
+        // show coin transfer effect
+        for (int i = bankerIndex + 1; i < GlobalDatas.croom.playerStatus.Length; i++)
+        {
+            if (GlobalDatas.croom.playerStatus[i].onRound == true)
+            {
+                if(result[bankerIndex] > result[i])
+                {
+                    coinEffect(persons[i].transform, persons[bankerIndex].transform);
+                }
+                else
+                {
+                    coinEffect(persons[bankerIndex].transform, persons[i].transform);
+                }
+            }
+        }
+        for (int i = 0; i < bankerIndex; i++)
+        {
+            if (GlobalDatas.croom.playerStatus[i].onRound == true)
+            {
+                if (result[bankerIndex] > result[i])
+                {
+                    coinEffect(persons[i].transform, persons[bankerIndex].transform);
+                }
+                else
+                {
+                    coinEffect(persons[bankerIndex].transform, persons[i].transform);
+                }
+            }
+        }
+
+        // show earn balance
         for (int i = GlobalDatas.myIndex; i < GlobalDatas.croom.playerStatus.Length; i++)
         {
             if (GlobalDatas.croom.playerStatus[i].onRound == true)
@@ -455,7 +475,42 @@ public class GameRoom : MonoBehaviour
             }
         }
     }
+
+    public void coinEffect(Transform startPosition, Transform endPosition)
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            GameObject newCoin = Instantiate(coin, new Vector2(startPosition.position.x, startPosition.position.y), Quaternion.identity);
+            newCoin.transform.SetParent(coinParent.transform);
+            newCoin.transform.localScale = new Vector3(1f, 1f, 1f);
+            StartCoroutine(coinTransfer(newCoin, endPosition));
+        }
+    }
+
+    private IEnumerator coinTransfer(GameObject newCoin, Transform endPosition)
+    {
+        float duration = 5f, timeElapsed = 0f;
+        float randomx = Random.Range(-0.3f, 0.3f);
+        float randomy = Random.Range(-0.3f, 0.3f);
+        float randomTime = Random.Range(0.1f, 0.8f);
+        Vector2 lastPosition = new Vector2(0f, 0f);
+
+        yield return new WaitForSeconds(randomTime);
+
+        while (timeElapsed < duration)
+        {
+            lastPosition = new Vector2(endPosition.position.x + randomx, endPosition.position.y + randomy);
+            newCoin.transform.position = Vector2.Lerp(newCoin.transform.position, lastPosition, timeElapsed);
+            timeElapsed += Time.deltaTime / 25;
+            yield return null;
+        }
+        newCoin.transform.position = lastPosition;
+        yield return new WaitForSeconds(1f);
+
+        Destroy(newCoin);
+    }
 }
+    
 
 public class Grab
 {

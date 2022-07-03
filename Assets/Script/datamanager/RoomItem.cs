@@ -20,7 +20,7 @@ public class RoomItem : MonoBehaviour
     {
         // set room info
         roominfo = new Room(_userinfo);
-        id_field.text = Random.Range(30000, 80000).ToString();
+        id_field.text = roominfo.roomNumber.ToString();
         setting_field.text = roominfo.setting;
         cost_field.text = (roominfo.cost).ToString();
 

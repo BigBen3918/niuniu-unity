@@ -42,17 +42,19 @@ public class Room
     public float cost;
     public string setting;
     public string name;
+    public int roomNumber;
     public int maxPlayer;
     public int gameStatus;
     public int roleCount;
     public User[] players;
     public User[] playerStatus;
 
-    public Room(string setting, float cost, string id = "", int maxPlayer = 6, int roleCount = -1, int gameStatus = 0)
+    public Room(string setting, float cost, int roomNumber = 0, string id = "", int maxPlayer = 6, int roleCount = -1, int gameStatus = 0)
     {
+        this.id = id;
+        this.roomNumber = roomNumber;
         this.setting = setting;
         this.cost = cost;
-        this.id = id;
         this.maxPlayer = maxPlayer;
         this.roleCount = roleCount;
         this.gameStatus = gameStatus;
@@ -61,6 +63,7 @@ public class Room
     public Room(Room _userinfo)
     {
         this.id = _userinfo.id;
+        this.roomNumber = _userinfo.roomNumber;
         this.setting = _userinfo.setting;
         this.cost = _userinfo.cost;
         this.players = _userinfo.players;
