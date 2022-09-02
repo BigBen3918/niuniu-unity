@@ -1,0 +1,21 @@
+{
+	"lang" : "English",
+	"title": "blockscan",
+	
+	"error.10000": "not found",
+	"error.20001": "无效邮箱",
+	"error.20005": "无效密码",
+	"error.20037": "已存在账户.",
+	"error.20030": "invalid paramter(s)",
+	"error.20032": "password mismatch",
+	"error.20034": "no permission",
+	
+	"error.32700": "Invalid JSON was received by the server. An error occurred on the server while parsing the JSON text.",
+	"error.32600":	"The JSON sent is not a valid Request object.",
+	"error.32601":	"The method does not exist / is not available.",
+	"error.32602":	"Invalid method parameter(s).",
+	"error.32603":	"Internal JSON-RPC error.",
+	"error.32604":	"Internal Authentication Method.",
+	"error.32000":	"Reserved for implementation-defined server-errors.",
+	"error.-1":		"Network disconnected"
+}
